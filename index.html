@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guía Interactiva del Tribunal Endovascular</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Cosmic Clarity -->
+    <!-- Application Structure Plan: The SPA uses a two-part structure. The first part statically presents the core 'Tribunal Rules' in easily scannable cards. The second, and primary, part is an interactive 'Maneuver Calculator'. Users input their MasterPoints (MP), and the application dynamically displays only the maneuver tier they qualify for. This task-oriented design was chosen over a linear document replica because it directly answers the user's key question ("What can I do?") and reduces cognitive load by hiding irrelevant information, making the tool more practical and user-centric. -->
+    <!-- Visualization & Content Choices: Report Info: Tribunal Rules -> Goal: Inform -> Viz: Styled cards with icons (HTML/CSS) -> Interaction: Hover effects -> Justification: Breaks down rules into digestible chunks. Report Info: MasterPoint Tiers/Maneuvers -> Goal: Inform/Engage -> Viz: Interactive calculator (HTML input + JS) with a dynamic results display -> Interaction: User inputs MP score to reveal their specific abilities -> Justification: Transforms a static list into a personalized, interactive tool. A simple CSS bar will visually indicate the MP level. This avoids loading a full charting library for a simple data representation. CONFIRMING NO SVG/Mermaid. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #0f172a; /* slate-900 */
+        }
+        .font-orbitron {
+            font-family: 'Orbitron', sans-serif;
+        }
+        .card {
+            background-color: #1e293b; /* slate-800 */
+            border: 1px solid #334155; /* slate-700 */
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 255, 255, 0.1);
+        }
+        .btn-glow {
+            background: linear-gradient(90deg, #0891b2, #22d3ee);
+            transition: box-shadow 0.3s ease;
+        }
+        .btn-glow:hover {
+            box-shadow: 0 0 15px #22d3ee;
+        }
+        .maneuver-card {
+            border-left: 4px solid #0891b2; /* cyan-600 */
+        }
+        #results-container {
+            transition: opacity 0.5s ease-in-out;
+        }
+        .hidden-start {
+            opacity: 0;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.7s ease-in-out, opacity 0.5s ease-in-out;
+        }
+        .visible-result {
+            opacity: 1;
+            max-height: 1000px; /* Large enough to not clip content */
+        }
+    </style>
+</head>
+<body class="text-slate-200">
+
+    <div class="container mx-auto p-4 md:p-8 max-w-5xl">
+
+        <header class="text-center mb-12">
+            <h1 class="font-orbitron text-3xl md:text-5xl font-bold text-cyan-400 mb-2">Tribunal Endovascular</h1>
+            <p class="text-lg text-slate-400">Tu guía de referencia rápida para la prueba final.</p>
+        </header>
+
+        <main>
+            <!-- Section 1: Rules -->
+            <section id="rules" class="mb-16">
+                <h2 class="font-orbitron text-2xl md:text-3xl font-bold text-center mb-2 text-white">Protocolo del Tribunal</h2>
+                <p class="text-center text-slate-400 max-w-3xl mx-auto mb-8">
+                    Esta sección detalla tu rol y las reglas fundamentales que rigen el Tribunal. Familiarízate con el protocolo para asegurar una defensa fluida y efectiva de tu Expediente Angiográfico.
+                </p>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="card rounded-lg p-6">
+                        <h3 class="font-orbitron text-xl font-bold text-cyan-400 mb-3">Defensa Individual</h3>
+                        <p class="text-slate-300">Cada AngioMaster defiende un caso. En pareja, cada uno se encarga de una imagen distinta (Cardiología o Neurorradiología).</p>
+                    </div>
+                    <div class="card rounded-lg p-6">
+                        <h3 class="font-orbitron text-xl font-bold text-cyan-400 mb-3">Tiempo de Defensa</h3>
+                        <p class="text-slate-300">Dispones de un máximo de <span class="font-bold text-white">3 minutos</span> para describir el caso proyectado y demostrar tu análisis.</p>
+                    </div>
+                    <div class="card rounded-lg p-6">
+                        <h3 class="font-orbitron text-xl font-bold text-cyan-400 mb-3">Interrogatorio</h3>
+                        <p class="text-slate-300">El Sumo Cartógrafo realizará 1 pregunta de integración. Tendrás <span class="font-bold text-white">1 minuto</span> para formular tu respuesta.</p>
+                    </div>
+                    <div class="card rounded-lg p-6">
+                        <h3 class="font-orbitron text-xl font-bold text-cyan-400 mb-3">Evaluación</h3>
+                        <p class="text-slate-300">Tu desempeño se evalúa de forma individual, basándose en la Rúbrica de Veredicto del Tribunal que ya conoces.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 2: Maneuvers -->
+            <section id="maneuvers">
+                 <h2 class="font-orbitron text-2xl md:text-3xl font-bold text-center mb-2 text-white">Calculadora de Maniobras</h2>
+                 <p class="text-center text-slate-400 max-w-3xl mx-auto mb-8">
+                    Tus MasterPoints (MP) acumulados desbloquean habilidades estratégicas. Introduce tu puntaje total para descubrir tu Grado de Maestría y las Maniobras que puedes activar. Recuerda: solo puedes elegir y activar UNA maniobra durante tu defensa.
+                </p>
+
+                <div class="bg-slate-800 border border-slate-700 rounded-lg p-6 md:p-8 max-w-2xl mx-auto">
+                    <div class="flex flex-col sm:flex-row items-center gap-4 mb-6">
+                        <label for="mp-input" class="font-orbitron text-lg font-bold whitespace-nowrap">Ingresa tus MasterPoints (MP):</label>
+                        <input type="number" id="mp-input" placeholder="Ej: 210" class="w-full bg-slate-900 border border-slate-600 rounded-md py-2 px-4 text-white focus:ring-2 focus:ring-cyan-500 focus:outline-none transition">
+                    </div>
+                    <button id="calculate-btn" class="btn-glow w-full font-orbitron font-bold text-lg text-slate-900 py-3 rounded-md">
+                        Revelar Mi Grado de Maestría
+                    </button>
+                    
+                    <div id="results-container" class="hidden-start mt-8">
+                        <h3 id="mastery-grade" class="font-orbitron text-2xl font-bold text-center mb-2"></h3>
+                        <p id="mastery-narrative" class="text-center text-cyan-400 mb-6"></p>
+                        <div id="maneuvers-list" class="space-y-4"></div>
+                    </div>
+                     <div id="error-message" class="text-center text-yellow-400 mt-4 font-bold"></div>
+                </div>
+            </section>
+        </main>
+
+        <footer class="text-center mt-16 text-slate-500 text-sm">
+            <p>Convocatoria emitida por Maxi Hawk, Sumo Cartógrafo del Universo AngioMasters.</p>
+            <p>&copy; 2025 Guía Interactiva del Tribunal. Todos los derechos reservados.</p>
+        </footer>
+
+    </div>
+
+    <script>
+        const maneuversData = {
+            formation: {
+                grade: "AngioMaster en Formación",
+                range: "100 - 179 MP",
+                narrative: "Una 'Asistencia Elemental' para afinar tu presentación.",
+                options: [
+                    { title: "Guía de Terminología Estelar", description: "Elija un ítem de 10% (Lenguaje técnico, Tipo de examen, Técnica angiográfica, Proyección angiográfica, Anatomía básica). El Sumo Cartógrafo recordará una palabra clave/concepto crucial para la excelencia de ese ítem." },
+                    { title: "Cálculo Rápido de Proyección", description: "Solicite confirmación (sí/no) si la proyección angiográfica que describe es la principal o más relevante." },
+                    { title: "Pulso del Anatomista", description: "Al describir la anatomía básica, pida al Sumo Cartógrafo que valide una estructura específica que usted nombre (confirmación correcta/incorrecta)." }
+                ]
+            },
+            consolidated: {
+                grade: "AngioMaster Consolidado",
+                range: "180 - 249 MP",
+                narrative: "'Ventajas Tácticas' para optimizar tu discurso.",
+                options: [
+                    { title: "Reafirmación del Tipo de Examen", description: "Pregunte si ha identificado correctamente el tipo de examen y la técnica angiográfica utilizada. El Sumo Cartógrafo confirmará si su afirmación principal es correcta para ambos." },
+                    { title: "Armonización del Lenguaje Técnico", description: "Si duda sobre un término técnico, susúrrelo al Sumo Cartógrafo, quien confirmará su adecuación (sí/no) o sugerirá una alternativa breve." },
+                    { title: "Claridad Angiográfica Focalizada", description: "Solicite al Sumo Cartógrafo que resalte o señale un área específica en la imagen angiográfica proyectada, relevante para la patología o anatomía (no revela la respuesta, solo enfoca)." }
+                ]
+            },
+            supreme: {
+                grade: "AngioMaster Supremo",
+                range: "250+ MP",
+                narrative: "'Poderes de Oráculo' para influir en los desafíos más complejos.",
+                options: [
+                    { title: "Foco de la Sonda Maestra", description: "Solicite una pista estratégica sobre la \"Ubicación de la patología\" (20%) del caso. La pista será una frase breve o dirección que guíe su pensamiento sin dar la respuesta." },
+                    { title: "Percepción de la Anomalía Crítica", description: "El Sumo Cartógrafo le proporcionará una palabra clave o concepto central que le ayude a orientar la respuesta para la \"Pregunta Relacionada\" (30% - Parte 1) del caso." },
+                    { title: "Resonancia Profunda del Interrogatorio", description: "Ante la pregunta individual de integración de conocimientos (Parte 2 del 30% de la \"Pregunta Relacionada\"), solicite una reformulación de la pregunta o, si es posible, una pregunta alternativa." }
+                ]
+            }
+        };
+
+        const calculateBtn = document.getElementById('calculate-btn');
+        const mpInput = document.getElementById('mp-input');
+        const resultsContainer = document.getElementById('results-container');
+        const masteryGradeEl = document.getElementById('mastery-grade');
+        const masteryNarrativeEl = document.getElementById('mastery-narrative');
+        const maneuversListEl = document.getElementById('maneuvers-list');
+        const errorMessageEl = document.getElementById('error-message');
+
+        const displayResults = (tier) => {
+            const data = maneuversData[tier];
+            masteryGradeEl.textContent = data.grade;
+            masteryNarrativeEl.textContent = data.narrative;
+            
+            maneuversListEl.innerHTML = '';
+            data.options.forEach(opt => {
+                const maneuverEl = document.createElement('div');
+                maneuverEl.className = 'maneuver-card bg-slate-900/50 p-4 rounded-md';
+                maneuverEl.innerHTML = `
+                    <h4 class="font-orbitron font-bold text-lg text-cyan-500">${opt.title}</h4>
+                    <p class="text-slate-300 mt-1">${opt.description}</p>
+                `;
+                maneuversListEl.appendChild(maneuverEl);
+            });
+
+            resultsContainer.classList.add('visible-result');
+            errorMessageEl.textContent = '';
+        };
+        
+        const displayError = (message) => {
+            errorMessageEl.textContent = message;
+            resultsContainer.classList.remove('visible-result');
+        }
+
+        const handleCalculation = () => {
+            const mp = parseInt(mpInput.value, 10);
+            
+            if (isNaN(mp) || mpInput.value.trim() === '') {
+                displayError("Por favor, introduce un valor numérico de MasterPoints.");
+                return;
+            }
+
+            if (mp >= 250) {
+                displayResults('supreme');
+            } else if (mp >= 180) {
+                displayResults('consolidated');
+            } else if (mp >= 100) {
+                displayResults('formation');
+            } else {
+                displayError("No tienes suficientes MasterPoints (mínimo 100) para acceder a una Maniobra de Gran AngioMaster.");
+            }
+        };
+
+        calculateBtn.addEventListener('click', handleCalculation);
+        mpInput.addEventListener('keydown', (event) => {
+            if (event.key === 'Enter') {
+                handleCalculation();
+            }
+        });
+
+    </script>
+</body>
+</html>

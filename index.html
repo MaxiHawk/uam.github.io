@@ -8,36 +8,50 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
-    <!-- Chosen Palette: Cosmic Clarity -->
+    <!-- Chosen Palette: AngioMasters Cosmic (Deep Black, Dark Teal, Bright Cyan, Rose Red, Warm Orange) -->
     <!-- Application Structure Plan: The SPA uses a two-part structure. The first part statically presents the core 'Tribunal Rules' in easily scannable cards. The second, and primary, part is an interactive 'Maneuver Calculator'. Users input their MasterPoints (MP), and the application dynamically displays only the maneuver tier they qualify for. This task-oriented design was chosen over a linear document replica because it directly answers the user's key question ("What can I do?") and reduces cognitive load by hiding irrelevant information, making the tool more practical and user-centric. -->
     <!-- Visualization & Content Choices: Report Info: Tribunal Rules -> Goal: Inform -> Viz: Styled cards with icons (HTML/CSS) -> Interaction: Hover effects -> Justification: Breaks down rules into digestible chunks. Report Info: MasterPoint Tiers/Maneuvers -> Goal: Inform/Engage -> Viz: Interactive calculator (HTML input + JS) with a dynamic results display -> Interaction: User inputs MP score to reveal their specific abilities -> Justification: Transforms a static list into a personalized, interactive tool. A simple CSS bar will visually indicate the MP level. This avoids loading a full charting library for a simple data representation. CONFIRMING NO SVG/Mermaid. -->
     <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
     <style>
+        :root {
+            --color-bg-primary: #0D0D0D; /* Very Dark Grey/Black from logo's background */
+            --color-bg-card: #1F80A6; /* Dark Blue/Teal from logo */
+            --color-border-card: #2E90B9; /* Slightly lighter blue for borders */
+            --color-text-primary: #E2E8F0; /* Light Slate for general text */
+            --color-text-secondary: #94A3B8; /* Muted Slate for subtitles/descriptions */
+            --color-text-highlight: #D92B5A; /* Red/Pink from logo's heart/wings for bold text */
+            --color-accent-cyan: #44E1F2; /* Bright Cyan from logo's blues */
+            --color-error: #F2A057; /* Orange/Peach from logo */
+        }
+
         body {
             font-family: 'Roboto', sans-serif;
-            background-color: #0f172a; /* slate-900 */
+            background-color: var(--color-bg-primary);
+            color: var(--color-text-primary);
         }
         .font-orbitron {
             font-family: 'Orbitron', sans-serif;
         }
         .card {
-            background-color: #1e293b; /* slate-800 */
-            border: 1px solid #334155; /* slate-700 */
+            background-color: var(--color-bg-card);
+            border: 1px solid var(--color-border-card);
             transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
         .card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 10px 20px rgba(0, 255, 255, 0.1);
+            box-shadow: 0 10px 20px rgba(68, 225, 242, 0.2); /* Cyan glow on hover */
         }
         .btn-glow {
-            background: linear-gradient(90deg, #0891b2, #22d3ee);
+            background: linear-gradient(90deg, var(--color-bg-card), var(--color-accent-cyan)); /* Gradient from card blue to bright cyan */
+            color: var(--color-bg-primary); /* Dark text on bright button */
             transition: box-shadow 0.3s ease;
         }
         .btn-glow:hover {
-            box-shadow: 0 0 15px #22d3ee;
+            box-shadow: 0 0 15px var(--color-accent-cyan);
         }
         .maneuver-card {
-            border-left: 4px solid #0891b2; /* cyan-600 */
+            border-left: 4px solid var(--color-accent-cyan);
+            background-color: rgba(31, 128, 166, 0.3); /* Semi-transparent version of card background */
         }
         #results-container {
             transition: opacity 0.5s ease-in-out;
@@ -52,6 +66,17 @@
             opacity: 1;
             max-height: 1000px; /* Large enough to not clip content */
         }
+        /* Re-mapping Tailwind classes to custom CSS variables for consistency */
+        .text-cyan-400 { color: var(--color-accent-cyan); }
+        .text-slate-200 { color: var(--color-text-primary); }
+        .text-slate-300 { color: var(--color-text-primary); } /* Using primary for card text */
+        .text-slate-400 { color: var(--color-text-secondary); }
+        .text-white { color: var(--color-text-highlight); } /* Using pink for bold text */
+        .text-yellow-400 { color: var(--color-error); }
+        .bg-slate-900 { background-color: var(--color-bg-primary); } /* Input background */
+        .bg-slate-800 { background-color: var(--color-bg-card); } /* Calculator container background */
+        .border-slate-700 { border-color: var(--color-border-card); } /* Calculator container border */
+        .border-slate-600 { border-color: var(--color-border-card); } /* Input border */
     </style>
 </head>
 <body class="text-slate-200">
@@ -103,13 +128,13 @@
                         <label for="mp-input" class="font-orbitron text-lg font-bold whitespace-nowrap">Ingresa tus MasterPoints (MP):</label>
                         <input type="number" id="mp-input" placeholder="Ej: 210" class="w-full bg-slate-900 border border-slate-600 rounded-md py-2 px-4 text-white focus:ring-2 focus:ring-cyan-500 focus:outline-none transition">
                     </div>
-                    <button id="calculate-btn" class="btn-glow w-full font-orbitron font-bold text-lg text-slate-900 py-3 rounded-md">
+                    <button id="calculate-btn" class="btn-glow w-full font-orbitron font-bold text-lg py-3 rounded-md">
                         Revelar Mi Grado de Maestría
                     </button>
                     
                     <div id="results-container" class="hidden-start mt-8">
-                        <h3 id="mastery-grade" class="font-orbitron text-2xl font-bold text-center mb-2"></h3>
-                        <p id="mastery-narrative" class="text-center text-cyan-400 mb-6"></p>
+                        <h3 id="mastery-grade" class="font-orbitron text-2xl font-bold text-center mb-2 text-yellow-400"></h3>
+                        <p id="mastery-narrative" class="text-center text-slate-300 mb-6"></p>
                         <div id="maneuvers-list" class="space-y-4"></div>
                     </div>
                      <div id="error-message" class="text-center text-yellow-400 mt-4 font-bold"></div>
@@ -170,15 +195,18 @@
             const data = maneuversData[tier];
             masteryGradeEl.textContent = data.grade;
             masteryNarrativeEl.textContent = data.narrative;
+            masteryNarrativeEl.className = 'text-center text-slate-300 mb-6'; /* Set to primary text color */
             
             maneuversListEl.innerHTML = '';
             data.options.forEach(opt => {
                 const maneuverEl = document.createElement('div');
                 maneuverEl.className = 'maneuver-card bg-slate-900/50 p-4 rounded-md';
                 maneuverEl.innerHTML = `
-                    <h4 class="font-orbitron font-bold text-lg text-cyan-500">${opt.title}</h4>
-                    <p class="text-slate-300 mt-1">${opt.description}</p>
+                    <h4 class="font-orbitron font-bold text-lg text-yellow-400"></h4>
+                    <p class="text-slate-300 mt-1"></p>
                 `;
+                maneuverEl.querySelector('h4').textContent = opt.title;
+                maneuverEl.querySelector('p').textContent = opt.description;
                 maneuversListEl.appendChild(maneuverEl);
             });
 

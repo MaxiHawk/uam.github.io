@@ -59,6 +59,7 @@
     <div class="container mx-auto p-4 md:p-8 max-w-5xl">
 
         <header class="text-center mb-12">
+            <img src="Figura 1 - Logotipo Angiomasters.png" alt="Logotipo Angiomasters" class="mx-auto mb-4" style="height: 80px; width: 80px;">
             <h1 class="font-orbitron text-3xl md:text-5xl font-bold text-cyan-400 mb-2">Tribunal Endovascular</h1>
             <p class="text-lg text-slate-400">Tu guía de referencia rápida para la prueba final.</p>
         </header>
@@ -127,7 +128,7 @@
         const maneuversData = {
             formation: {
                 grade: "AngioMaster en Formación",
-                range: "100 - 179 MP",
+                range: "90 - 199 MP",
                 narrative: "Una 'Asistencia Elemental' para afinar tu presentación.",
                 options: [
                     { title: "Guía de Terminología Estelar", description: "Elija un ítem de 10% (Lenguaje técnico, Tipo de examen, Técnica angiográfica, Proyección angiográfica, Anatomía básica). El Sumo Cartógrafo recordará una palabra clave/concepto crucial para la excelencia de ese ítem." },
@@ -137,7 +138,7 @@
             },
             consolidated: {
                 grade: "AngioMaster Consolidado",
-                range: "180 - 249 MP",
+                range: "200 - 299 MP",
                 narrative: "'Ventajas Tácticas' para optimizar tu discurso.",
                 options: [
                     { title: "Reafirmación del Tipo de Examen", description: "Pregunte si ha identificado correctamente el tipo de examen y la técnica angiográfica utilizada. El Sumo Cartógrafo confirmará si su afirmación principal es correcta para ambos." },
@@ -147,7 +148,7 @@
             },
             supreme: {
                 grade: "AngioMaster Supremo",
-                range: "250+ MP",
+                range: "300+ MP",
                 narrative: "'Poderes de Oráculo' para influir en los desafíos más complejos.",
                 options: [
                     { title: "Foco de la Sonda Maestra", description: "Solicite una pista estratégica sobre la \"Ubicación de la patología\" (20%) del caso. La pista será una frase breve o dirección que guíe su pensamiento sin dar la respuesta." },
@@ -198,14 +199,14 @@
                 return;
             }
 
-            if (mp >= 250) {
+            if (mp >= 300) {
                 displayResults('supreme');
-            } else if (mp >= 180) {
+            } else if (mp >= 200) {
                 displayResults('consolidated');
-            } else if (mp >= 100) {
+            } else if (mp >= 90) {
                 displayResults('formation');
             } else {
-                displayError("No tienes suficientes MasterPoints (mínimo 100) para acceder a una Maniobra de Gran AngioMaster.");
+                displayError("No tienes suficientes MasterPoints (mínimo 90) para acceder a una Maniobra de Gran AngioMaster.");
             }
         };
 
